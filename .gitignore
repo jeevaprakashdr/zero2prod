@@ -2,5 +2,5 @@
 *.pdb
 
 /target
-
+/.idea
 # 
