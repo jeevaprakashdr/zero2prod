@@ -1,5 +1,5 @@
 #[tokio::test]
-async fn should_return_Ok_response () {
+async fn should_return_ok_response () {
     // Arrange
     spawn_app();
 
@@ -17,7 +17,7 @@ async fn should_return_Ok_response () {
     assert_eq!(Some(0), response.content_length());
 }
 
-async fn spawn_app() {
+fn spawn_app() {
     let server = zero2prod::run().expect("Failed to bind address");
     let _ = tokio::spawn(server);
 }
