@@ -30,7 +30,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     let body = "name=rusty&email=ichbeginenrusty%40gmail.com";
     let response = client
         .post(format!("{}/subscriptions", app_address))
-        .header("Content-Tyoe", "application/x-www-form-urlencoded")
+        .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
         .await
@@ -41,7 +41,7 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 }
 
 #[tokio::test]
-async fn subscribe_returns_a_500_when_data_is_missing() {
+async fn subscribe_returns_a_400_when_data_is_missing() {
     //Arrange
     let app_url = spawn_app();
     let client = Client::new();
@@ -55,7 +55,7 @@ async fn subscribe_returns_a_500_when_data_is_missing() {
         // Act
         let response = client
             .post(format!("{}/subscriptions", app_url))
-            .header("Content-Tyoe", "application/x-www-form-urlencoded")
+            .header("Content-Type", "application/x-www-form-urlencoded")
             .body(body)
             .send()
             .await
