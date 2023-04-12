@@ -5,10 +5,22 @@ authors = ["jeeva<jeeva.ramu@codurance.com>"]
 edition = "2021"
 
 [lib]
-path="src/lib.rs"
+path = "src/lib.rs"
 
 [dependencies]
 actix-web = "4.3.1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 reqwest = "0.11"
 serde = { version = "1.0.159", features = ["derive"] }
+
+[dependencies.sqlx]
+version = "0.6"
+default-features = false
+features = [
+    "runtime-tokio-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate",
+]
