@@ -1,6 +1,7 @@
-use std::net::TcpListener;
 use reqwest::Client;
-use zero2prod::startup::run;
+use sqlx::{PgConnection, Connection};
+use std::net::TcpListener;
+use zero2prod::{configuration::get_configuration, startup::run};
 
 #[tokio::test]
 async fn should_return_ok_response() {
@@ -25,12 +26,18 @@ async fn should_return_ok_response() {
 async fn subscribe_returns_a_200_for_valid_form_data() {
     // Arrange
     let app_address = spawn_app();
+    let configuration = get_configuration().expect("Failed to get configuration");
+    let connection_string = configuration.database.connection_string();
+    let mut connection = PgConnection::connect(&connection_string)
+        .await
+        .expect("Failed to connect to database");
+
     let client = Client::new();
 
     // Act
     let body = "name=rusty&email=ichbeginenrusty%40gmail.com";
     let response = client
-        .post(format!("{}/subscriptions", app_address))
+        .post(&format!("{}/subscriptions", &app_address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
@@ -39,6 +46,15 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
     //Assert
     assert_eq!(response.status().as_u16(), 200);
+
+    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+    .fetch_one(&mut connection)
+    .await
+    .expect("Failed to fetch saved subscription");
+
+    assert_eq!(saved.email, "ichbeginenrusty@gmail.com");
+    assert_eq!(saved.name, "rusty");
+
 }
 
 #[tokio::test]
