@@ -1,5 +1,5 @@
 use reqwest::Client;
-use sqlx::{PgConnection, Connection};
+use sqlx::{Connection, PgConnection};
 use std::net::TcpListener;
 use zero2prod::{configuration::get_configuration, startup::run};
 
@@ -48,13 +48,11 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
     assert_eq!(response.status().as_u16(), 200);
 
     let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
-    .fetch_one(&mut connection)
-    .await
-    .expect("Failed to fetch saved subscription");
-
+        .fetch_one(&mut connection)
+        .await
+        .expect("Failed to fetch saved subscription");
     assert_eq!(saved.email, "ichbeginenrusty@gmail.com");
     assert_eq!(saved.name, "rusty");
-
 }
 
 #[tokio::test]
