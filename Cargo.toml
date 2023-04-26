@@ -8,6 +8,7 @@ edition = "2021"
 path = "src/lib.rs"
 
 [dependencies]
+log = "0.4.17"
 env_logger = "0.10.0"
 config = "0.13.0"
 actix-web = "4.3.1"
