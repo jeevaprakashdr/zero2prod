@@ -28,12 +28,12 @@ then
     -e POSTGRES_PASSWORD=${DB_PASSWORD} \
     -e POSTGRES_DB=${DB_NAME} \
     -p "${DB_PORT}":5432 \
-    -d ${DB_NAME} \
+    -d postgres \
     postgres -N 1000
 fi
 # Keep pinging Postgres until it's ready to accept commands
 export PGPASSWORD="${DB_PASSWORD}"
-until psql -h "${DB_HOST}" -U "${DB_USER}" -p "${DB_PORT}" -d ${DB_NAME} -c '\q'; do
+until psql -h "${DB_HOST}" -U "${DB_USER}" -p "${DB_PORT}" -d "postgres" -c '\q'; do
     >&2 echo "Postgres is still unavailable - sleeping"
     sleep 1
 done
