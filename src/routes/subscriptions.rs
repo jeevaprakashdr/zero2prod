@@ -13,7 +13,6 @@ pub struct SubscribeRequest {
     name = "Adding a new subscriber",
     skip(subscribe_request, connection_pool),
     fields(
-    request_id = %Uuid::new_v4(),
     subscriber_email = %subscribe_request.email,
     subscriber_name = %subscribe_request.name
     )
