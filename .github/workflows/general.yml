@@ -36,7 +36,7 @@ jobs:
         image: postgres:14
         # Environment variables scoped only for the `postgres` element
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: zerotoprod
           POSTGRES_PASSWORD: password
           POSTGRES_DB: postgres
         # When you map ports using the ports keyword, GitHub uses the --publish command to publish the container’s ports to the Docker host
@@ -106,9 +106,9 @@ jobs:
       postgres:
         image: postgres:14
         env:
-          POSTGRES_USER: postgres
+          POSTGRES_USER: zerotoprod
           POSTGRES_PASSWORD: password
-          POSTGRES_DB: postgres
+          POSTGRES_DB: newsletter
         ports:
           - 5432:5432
     steps:
