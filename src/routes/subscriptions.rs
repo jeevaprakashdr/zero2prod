@@ -19,7 +19,7 @@ pub async fn subscribe(
     %request_id,
     subscribe_email=%subscribe_request.email,
     subscribe_name=%subscribe_request.name);
-    
+
     let _request_span_guard = request_span.enter();
 
     let query_span = tracing::info_span!("Saving new subscriber details");
@@ -39,7 +39,11 @@ pub async fn subscribe(
     {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(e) => {
-            tracing::error!("request_id {} = Failed to execute query: {:?}", request_id, e);
+            tracing::error!(
+                "request_id {} = Failed to execute query: {:?}",
+                request_id,
+                e
+            );
             HttpResponse::InternalServerError().finish()
         }
     }
