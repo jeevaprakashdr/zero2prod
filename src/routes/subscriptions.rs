@@ -23,8 +23,14 @@ pub async fn subscribe(
     subscribe_request: web::Form<SubscribeRequest>,
     connection_pool: web::Data<PgPool>,
 ) -> HttpResponse {
+
+    let name = match SubscriberName::parse(subscribe_request.0.name){
+        Ok(name) => name,
+        Err(_) => return HttpResponse::InternalServerError().finish()
+    };
+
     let new_subscriber = NewSubscriber {
-        name: SubscriberName::parse(subscribe_request.0.name).expect("name validation failed"),
+        name,
         email: subscribe_request.0.email,
     };
 
