@@ -28,6 +28,10 @@ chrono = { version = "0.4.22", default-features = false, features = ["clock"] }
 unicode-segmentation = "1"
 claims = "0.7.1"
 validator = "0.16.0"
+fake = "2.6.1"
+rand = "0.8.5"
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"
 
 [dependencies.sqlx]
 version = "0.6"
