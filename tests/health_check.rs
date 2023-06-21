@@ -4,7 +4,7 @@ use std::net::TcpListener;
 use uuid::Uuid;
 use zero2prod::{
     configuration::{get_configuration, DatabaseSettings},
-    email_client::{self, EmailClient},
+    email_client::EmailClient,
     startup::run,
 };
 
