@@ -10,4 +10,5 @@ database:
   require_ssl: false
 email_client:
   base_url: "localhost"
-  send_email: "test@gmail.com"
+  sender_email: "test@gmail.com"
+  authorization_token: "my-secret-token"
