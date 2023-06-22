@@ -1,6 +1,6 @@
 use reqwest::Client;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
-use std::net::TcpListener;
+use std::{net::TcpListener, time::Duration};
 use uuid::Uuid;
 use zero2prod::{
     configuration::{get_configuration, DatabaseSettings},
@@ -137,6 +137,7 @@ async fn spawn_app() -> TestApp {
         configuration.email_client.base_url,
         sender_email,
         configuration.email_client.authorization_token,
+        Duration::from_secs(configuration.email_client.timeout_milliseconds),
     );
     let server =
         run(listener, connection_pool.clone(), email_client).expect("Failed to bind address");

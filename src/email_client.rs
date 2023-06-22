@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crate::domain::SubscriberEmail;
 use reqwest::Client;
 use secrecy::{ExposeSecret, Secret};
@@ -14,11 +16,9 @@ impl EmailClient {
         base_url: String,
         sender: SubscriberEmail,
         authorization_token: Secret<String>,
+        timeout: Duration,
     ) -> Self {
-        let http_client = Client::builder()
-            .timeout(std::time::Duration::from_secs(10))
-            .build()
-            .unwrap();
+        let http_client = Client::builder().timeout(timeout).build().unwrap();
 
         Self {
             sender,
@@ -71,6 +71,8 @@ struct SendEmailRequest<'a> {
 
 #[cfg(test)]
 mod tests {
+    use std::time::Duration;
+
     use claims::{assert_err, assert_ok};
     use fake::{
         faker::{
@@ -104,7 +106,13 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
+
+        let email_client = EmailClient::new(
+            mock_server.uri(),
+            sender,
+            Secret::new(Faker.fake()),
+            Duration::from_secs(10),
+        );
 
         Mock::given(header_exists("X-Postmark-Server-Token"))
             .and(header("Content-Type", "application/json"))
@@ -127,7 +135,13 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
+        let timeout = Duration::from_secs(10);
+        let email_client = EmailClient::new(
+            mock_server.uri(),
+            sender,
+            Secret::new(Faker.fake()),
+            timeout,
+        );
 
         Mock::given(any())
             .respond_with(ResponseTemplate::new(200))
@@ -149,7 +163,13 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
+        let timeout = Duration::from_secs(10);
+        let email_client = EmailClient::new(
+            mock_server.uri(),
+            sender,
+            Secret::new(Faker.fake()),
+            timeout,
+        );
 
         Mock::given(any())
             .respond_with(ResponseTemplate::new(500))
@@ -171,7 +191,13 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender, Secret::new(Faker.fake()));
+        let timeout = Duration::from_secs(10);
+        let email_client = EmailClient::new(
+            mock_server.uri(),
+            sender,
+            Secret::new(Faker.fake()),
+            timeout,
+        );
 
         let response = ResponseTemplate::new(200).set_delay(std::time::Duration::from_secs(180));
         Mock::given(any())
