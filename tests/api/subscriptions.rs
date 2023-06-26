@@ -1,11 +1,10 @@
-
 use crate::helpers::spawn_app;
 
 #[tokio::test]
 async fn subscribe_returns_a_200_for_valid_form_data() {
     // Arrange
     let app: crate::helpers::TestApp = spawn_app().await;
-    
+
     // Act
     let body = "name=rusty&email=ichbeginenrusty%40gmail.com";
     let response = app.post_subscription(body.into()).await;
