@@ -21,13 +21,31 @@ async fn subscribe_returns_a_200_for_valid_form_data() {
 
     //Assert
     assert_eq!(response.status().as_u16(), 200);
+}
 
-    let saved = sqlx::query!("SELECT email, name FROM subscriptions",)
+#[tokio::test]
+async fn subscribe_persists_the_new_subscriber() {
+    // Arrange
+    let app: crate::helpers::TestApp = spawn_app().await;
+    let body = "name=rusty&email=ichbeginenrusty%40gmail.com";
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&app.email_server)
+        .await;
+
+    // Act
+    let _ = app.post_subscription(body.into()).await;
+
+    //Assert
+    let saved = sqlx::query!("SELECT email, name, status FROM subscriptions",)
         .fetch_one(&app.db_pool)
         .await
         .expect("Failed to fetch saved subscription");
+
     assert_eq!(saved.email, "ichbeginenrusty@gmail.com");
     assert_eq!(saved.name, "rusty");
+    assert_eq!(saved.status, "pending_confirmation");
 }
 
 #[tokio::test]
