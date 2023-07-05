@@ -7,6 +7,7 @@ use crate::{
     domain::{NewSubscriber, SubscriberEmail, SubscriberName},
     email_client::EmailClient,
 };
+use crate::startup::ApplicationBaseUrl;
 
 #[derive(serde::Deserialize)]
 pub struct SubscribeRequest {
@@ -26,7 +27,7 @@ impl TryFrom<web::Form<SubscribeRequest>> for NewSubscriber {
 
 #[tracing::instrument(
     name = "Adding a new subscriber",
-    skip(subscribe_request, connection_pool, email_client),
+    skip(subscribe_request, connection_pool, email_client, base_url),
     fields(
     subscriber_email = %subscribe_request.email,
     subscriber_name = %subscribe_request.name
@@ -36,6 +37,7 @@ pub async fn subscribe(
     subscribe_request: web::Form<SubscribeRequest>,
     connection_pool: web::Data<PgPool>,
     email_client: web::Data<EmailClient>,
+    base_url: web::Data<ApplicationBaseUrl>
 ) -> HttpResponse {
     let new_subscriber = match subscribe_request.try_into() {
         Ok(form) => form,
@@ -49,7 +51,7 @@ pub async fn subscribe(
         return HttpResponse::InternalServerError().finish();
     }
 
-    if send_confirmation_email(&email_client, new_subscriber)
+    if send_confirmation_email(&email_client, new_subscriber, &base_url.0)
         .await
         .is_err()
     {
@@ -94,8 +96,9 @@ pub async fn insert_subscriber(
 pub async fn send_confirmation_email(
     email_client: &EmailClient,
     new_subscriber: NewSubscriber,
+    base_url: &str
 ) -> Result<(), reqwest::Error> {
-    let confirmation_link = "https://there-is-no-such-domain.com/subscriptions/confirm";
+    let confirmation_link = format!("{}/subscriptions/confirm?subscription_token=token", base_url);
     email_client
         .send_email(
             new_subscriber.email,
