@@ -48,7 +48,7 @@ pub async fn subscribe(
 
     let mut transaction = match connection_pool.begin().await {
         Err(_) => return HttpResponse::InternalServerError().finish(),
-        Ok(transaction) => transaction
+        Ok(transaction) => transaction,
     };
 
     let subscriber_id = match insert_subscriber(&new_subscriber, &mut transaction).await {
@@ -144,7 +144,10 @@ pub async fn send_confirmation_email(
         .await
 }
 
-#[tracing::instrument(name = "store subscription token", skip(transaction, subscription_token))]
+#[tracing::instrument(
+    name = "store subscription token",
+    skip(transaction, subscription_token)
+)]
 pub async fn store_token(
     transaction: &mut Transaction<'_, Postgres>,
     subscriber_id: Uuid,

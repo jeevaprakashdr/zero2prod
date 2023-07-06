@@ -26,9 +26,7 @@ pub async fn confirm(parameters: web::Query<Parameters>, pool: web::Data<PgPool>
     }
 }
 
-#[tracing::instrument(
-    name = "update subscription status to 'confirm'", 
-    skip(pool, id))]
+#[tracing::instrument(name = "update subscription status to 'confirm'", skip(pool, id))]
 pub async fn confirm_subscription(pool: &PgPool, id: Uuid) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"Update subscriptions set status = 'confirmed' where id =$1"#,
