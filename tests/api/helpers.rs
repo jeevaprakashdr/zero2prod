@@ -25,7 +25,7 @@ pub struct TestApp {
     pub address: String,
     pub db_pool: PgPool,
     pub email_server: MockServer,
-    pub port: u16
+    pub port: u16,
 }
 
 pub struct ConfirmationLinks {
@@ -52,7 +52,7 @@ impl TestApp {
                 .links(s)
                 .filter(|l| *l.kind() == linkify::LinkKind::Url)
                 .collect();
-            assert_eq!(links.len(),1);
+            assert_eq!(links.len(), 1);
 
             let raw_link = links.first().unwrap().as_str().to_owned();
             let mut confirmation_link = reqwest::Url::parse(&raw_link).unwrap();
@@ -63,10 +63,7 @@ impl TestApp {
 
         let html = get_link(&body["HtmlBody"].as_str().unwrap());
         let plain_text = get_link(&body["TextBody"].as_str().unwrap());
-        ConfirmationLinks {
-            html,
-            plain_text
-        }
+        ConfirmationLinks { html, plain_text }
     }
 }
 
@@ -96,7 +93,7 @@ pub async fn spawn_app() -> TestApp {
         address,
         db_pool: get_connection_pool(&configuration.database),
         email_server,
-        port: application_port
+        port: application_port,
     }
 }
 

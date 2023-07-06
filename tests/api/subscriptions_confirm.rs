@@ -1,6 +1,6 @@
+use crate::helpers::spawn_app;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
-use crate::helpers::spawn_app;
 
 #[tokio::test]
 async fn confirmation_without_token_are_rejected_with_a_400() {
@@ -31,9 +31,7 @@ async fn the_link_return_by_the_subscribe_returns_200_response_if_called() {
     let confirmation_links = app.get_confirmation_links(&email_request);
 
     // Act
-    let response = reqwest::get(confirmation_links.html)
-        .await
-        .unwrap();
+    let response = reqwest::get(confirmation_links.html).await.unwrap();
 
     //Assert
     assert_eq!(response.status().as_u16(), 200);
@@ -55,9 +53,7 @@ async fn clicking_on_the_subscription_link_confirms_a_subscriber() {
     let confirmation_links = app.get_confirmation_links(&email_request);
 
     // Act
-    let _ = reqwest::get(confirmation_links.html)
-        .await
-        .unwrap();
+    let _ = reqwest::get(confirmation_links.html).await.unwrap();
 
     //Assert
     let saved = sqlx::query!("SELECT email, name, status from subscriptions")
