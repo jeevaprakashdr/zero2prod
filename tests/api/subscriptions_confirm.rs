@@ -1,4 +1,3 @@
-use reqwest::Url;
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, ResponseTemplate};
 use crate::helpers::spawn_app;
@@ -38,4 +37,33 @@ async fn the_link_return_by_the_subscribe_returns_200_response_if_called() {
 
     //Assert
     assert_eq!(response.status().as_u16(), 200);
+}
+
+#[tokio::test]
+async fn clicking_on_the_subscription_link_confirms_a_subscriber() {
+    // Arrange
+    let app = spawn_app().await;
+    let body = "name=rusty&email=ichbeginenrusty%40gmail.com";
+    Mock::given(path("/email"))
+        .and(method("POST"))
+        .respond_with(ResponseTemplate::new(200))
+        .mount(&app.email_server)
+        .await;
+
+    app.post_subscription(body.into()).await;
+    let email_request = &app.email_server.received_requests().await.unwrap()[0];
+    let confirmation_links = app.get_confirmation_links(&email_request);
+
+    // Act
+    let _ = reqwest::get(confirmation_links.html)
+        .await
+        .unwrap();
+
+    //Assert
+    let saved = sqlx::query!("SELECT email, name, status from subscriptions")
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to get subscription");
+
+    assert_eq!(saved.status, "confirmed");
 }
