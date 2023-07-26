@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use sqlx::{PgPool};
+use sqlx::PgPool;
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
@@ -19,9 +19,8 @@ pub struct ConfirmedSubscriber {
 
 pub async fn publish_newsletters(
     _body: web::Json<BodyData>,
-    _pool: web::Data<PgPool>
-    ) -> HttpResponse {
-
+    _pool: web::Data<PgPool>,
+) -> HttpResponse {
     //let _subscribers = get_confirmed_subscribers(&pool).await?;
 
     HttpResponse::Ok().finish()

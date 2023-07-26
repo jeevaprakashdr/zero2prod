@@ -6,7 +6,7 @@ use tracing_actix_web::TracingLogger;
 use crate::{
     configuration::{DatabaseSettings, Settings},
     email_client::EmailClient,
-    routes::{confirm, health_check, subscribe, publish_newsletters},
+    routes::{confirm, health_check, publish_newsletters, subscribe},
 };
 
 pub struct Application {

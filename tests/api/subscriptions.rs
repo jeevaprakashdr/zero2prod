@@ -153,6 +153,6 @@ async fn subscriber_fails_if_there_is_database_error() {
     // Act
     let response = app.post_subscription(body.into()).await;
 
-    // Assert   
+    // Assert
     assert_eq!(response.status().as_u16(), 500);
 }

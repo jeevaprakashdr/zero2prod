@@ -3,7 +3,7 @@ use wiremock::{
     Mock, ResponseTemplate,
 };
 
-use crate::helpers::{spawn_app, TestApp, self};
+use crate::helpers::{self, spawn_app, TestApp};
 
 #[tokio::test]
 async fn newsletters_are_not_delivered_to_unconfirmed_subscribers() {
@@ -66,27 +66,34 @@ async fn newsletters_returns_400_for_invalid_data() {
     // Arrange
     let app = spawn_app().await;
     let test_cases = vec![
-        (serde_json::json!({
-            "title": "Newsletter title",
-        }), "missing content"),
-        (serde_json::json!({
-            "content": {
-                "text": "Newsletter body as plain text",
-                "html": "<p>Newsletter body as HTML</p>",
-            }
-        }), "missing title")
+        (
+            serde_json::json!({
+                "title": "Newsletter title",
+            }),
+            "missing content",
+        ),
+        (
+            serde_json::json!({
+                "content": {
+                    "text": "Newsletter body as plain text",
+                    "html": "<p>Newsletter body as HTML</p>",
+                }
+            }),
+            "missing title",
+        ),
     ];
 
     // Act
-    for (invalid_body, error_message) in test_cases
-    {
+    for (invalid_body, error_message) in test_cases {
         let response = app.post_newsletters(invalid_body).await;
 
         // Assert
-        assert_eq!(400,
+        assert_eq!(
+            400,
             response.status().as_u16(),
             "API did not fail with 400 Bad Request when the payload was {}",
-            error_message);
+            error_message
+        );
     }
 }
 
