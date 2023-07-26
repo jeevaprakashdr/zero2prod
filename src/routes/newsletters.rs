@@ -3,18 +3,18 @@ use sqlx::{PgPool};
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
-    title: String,
-    content: Content,
+    _title: String,
+    _content: Content,
 }
 
 #[derive(serde::Deserialize)]
 pub struct Content {
-    html: String,
-    text: String,
+    _html: String,
+    _text: String,
 }
 
 pub struct ConfirmedSubscriber {
-    email: String,
+    _email: String,
 }
 
 pub async fn publish_newsletters(
@@ -27,13 +27,13 @@ pub async fn publish_newsletters(
     HttpResponse::Ok().finish()
 }
 
-async fn get_confirmed_subscribers(pool: &PgPool) -> Result<Vec<ConfirmedSubscriber>, sqlx::Error> {
-    let rows = sqlx::query_as!(
-        ConfirmedSubscriber,
-        r#"SELECT email FROM subscriptions WHERE status='confirmed'"#
-    )
-    .fetch_all(pool)
-    .await?;
+// async fn get_confirmed_subscribers(pool: &PgPool) -> Result<Vec<ConfirmedSubscriber>, sqlx::Error> {
+//     let rows = sqlx::query_as!(
+//         ConfirmedSubscriber,
+//         r#"SELECT email FROM subscriptions WHERE status='confirmed'"#
+//     )
+//     .fetch_all(pool)
+//     .await?;
 
-    Ok(rows)
-}
+//     Ok(rows)
+// }
