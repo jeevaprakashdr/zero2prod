@@ -27,6 +27,17 @@ impl TryFrom<web::Form<SubscribeRequest>> for NewSubscriber {
     }
 }
 
+#[derive(Debug)]
+struct SubscribeError {}
+impl std::fmt::Display for SubscribeError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "failed to create a new subscriber")
+    }
+}
+
+impl std::error::Error for SubscribeError {}
+impl ResponseError for SubscribeError {}
+
 #[tracing::instrument(
     name = "Adding a new subscriber",
     skip(subscribe_request, connection_pool, email_client, base_url),
@@ -40,7 +51,7 @@ pub async fn subscribe(
     connection_pool: web::Data<PgPool>,
     email_client: web::Data<EmailClient>,
     base_url: web::Data<ApplicationBaseUrl>,
-) -> Result<HttpResponse, actix_web::Error> {
+) -> Result<HttpResponse, SubscribeError> {
     let new_subscriber = match subscribe_request.try_into() {
         Ok(form) => form,
         Err(_) => return Ok(HttpResponse::BadRequest().finish()),
@@ -140,8 +151,6 @@ pub async fn send_confirmation_email(
 }
 
 pub struct StoreTokenError(sqlx::Error);
-
-impl ResponseError for StoreTokenError {}
 
 impl std::fmt::Display for StoreTokenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
