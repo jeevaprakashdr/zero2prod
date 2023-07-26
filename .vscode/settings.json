@@ -4,6 +4,7 @@
         "chrono",
         "ichbeginenrusty",
         "reqwest",
-        "sqlx"
+        "sqlx",
+        "thiserror"
     ]
 }
