@@ -6,7 +6,6 @@ use rand::{thread_rng, Rng};
 use reqwest::StatusCode;
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
-use validator::ValidationError;
 
 use crate::startup::ApplicationBaseUrl;
 use crate::{
@@ -198,7 +197,7 @@ pub async fn store_token(
     )
     .execute(transaction)
     .await
-    .map_err(|e| StoreTokenError(e))?;
+    .map_err(StoreTokenError)?;
     Ok(())
 }
 

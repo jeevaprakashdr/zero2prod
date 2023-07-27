@@ -4,16 +4,17 @@ use sqlx::PgPool;
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
-    title: String,
-    content: Content,
+    _title: String,
+    _content: Content,
 }
 
 #[derive(serde::Deserialize)]
 pub struct Content {
-    html: String,
-    text: String,
+    _html: String,
+    _text: String,
 }
 
+#[allow(dead_code)]
 pub struct ConfirmedSubscriber {
     email: String,
 }
@@ -21,19 +22,19 @@ pub struct ConfirmedSubscriber {
 #[derive(thiserror::Error)]
 pub enum PublishError {
     #[error(transparent)]
-    UnexpectedError(#[from] anyhow::Error)
+    UnexpectedError(#[from] anyhow::Error),
 }
 
 impl std::fmt::Debug for PublishError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-       crate::routes::error_chain_fmt(self, f)
+        crate::routes::error_chain_fmt(self, f)
     }
 }
 
 impl ResponseError for PublishError {
     fn status_code(&self) -> reqwest::StatusCode {
         match self {
-            PublishError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR
+            PublishError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
@@ -47,7 +48,9 @@ pub async fn publish_newsletters(
     Ok(HttpResponse::Ok().finish())
 }
 
-async fn get_confirmed_subscribers(pool: &PgPool) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
+async fn get_confirmed_subscribers(
+    pool: &PgPool,
+) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
     let rows = sqlx::query_as!(
         ConfirmedSubscriber,
         r#"SELECT email FROM subscriptions WHERE status='confirmed'"#
