@@ -1,38 +1,59 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{web, HttpResponse, ResponseError};
+use reqwest::StatusCode;
 use sqlx::PgPool;
 
 #[derive(serde::Deserialize)]
 pub struct BodyData {
-    _title: String,
-    _content: Content,
+    title: String,
+    content: Content,
 }
 
 #[derive(serde::Deserialize)]
 pub struct Content {
-    _html: String,
-    _text: String,
+    html: String,
+    text: String,
 }
 
 pub struct ConfirmedSubscriber {
-    _email: String,
+    email: String,
+}
+
+#[derive(thiserror::Error)]
+pub enum PublishError {
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error)
+}
+
+impl std::fmt::Debug for PublishError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+       crate::routes::error_chain_fmt(self, f)
+    }
+}
+
+impl ResponseError for PublishError {
+    fn status_code(&self) -> reqwest::StatusCode {
+        match self {
+            PublishError::UnexpectedError(_) => StatusCode::INTERNAL_SERVER_ERROR
+        }
+    }
 }
 
 pub async fn publish_newsletters(
     _body: web::Json<BodyData>,
-    _pool: web::Data<PgPool>,
-) -> HttpResponse {
-    //let _subscribers = get_confirmed_subscribers(&pool).await?;
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, PublishError> {
+    let _subscribers = get_confirmed_subscribers(&pool).await?;
 
-    HttpResponse::Ok().finish()
+    Ok(HttpResponse::Ok().finish())
 }
 
-// async fn get_confirmed_subscribers(pool: &PgPool) -> Result<Vec<ConfirmedSubscriber>, sqlx::Error> {
-//     let rows = sqlx::query_as!(
-//         ConfirmedSubscriber,
-//         r#"SELECT email FROM subscriptions WHERE status='confirmed'"#
-//     )
-//     .fetch_all(pool)
-//     .await?;
+async fn get_confirmed_subscribers(pool: &PgPool) -> Result<Vec<ConfirmedSubscriber>, anyhow::Error> {
+    let rows = sqlx::query_as!(
+        ConfirmedSubscriber,
+        r#"SELECT email FROM subscriptions WHERE status='confirmed'"#
+    )
+    .fetch_all(pool)
+    .await?;
 
-//     Ok(rows)
-// }
+    Ok(rows)
+}
